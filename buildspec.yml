@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Starting CodeBuild..."
+
+  build:
+    commands:
+      - echo "Creating CodeDeploy deployment bundle..."
+      - rm -rf codedeploy-bundle
+      - mkdir -p codedeploy-bundle/scripts
+
+      # Backend application
+      - cp backend/app.py codedeploy-bundle/app.py
+      - cp backend/requirements.txt codedeploy-bundle/requirements.txt
+
+      # CodeDeploy configuration
+      - cp deploy/appspec.yml codedeploy-bundle/appspec.yml
+
+      # Deployment scripts
+      - cp deploy/scripts/*.sh codedeploy-bundle/scripts/
+
+      # Make scripts executable
+      - chmod +x codedeploy-bundle/scripts/*.sh
+
+      - echo "Deployment bundle:"
+      - find codedeploy-bundle -type f -print
+
+artifacts:
+  base-directory: codedeploy-bundle
+  files:
+    - '**/*'
