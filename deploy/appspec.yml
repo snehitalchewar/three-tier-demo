@@ -1,0 +1,34 @@
+version: 0.0
+
+os: linux
+
+files:
+  - source: app.py
+    destination: /opt/app
+
+  - source: requirements.txt
+    destination: /opt/app
+
+permissions:
+  - object: /opt/app
+    owner: appuser
+    group: appuser
+    pattern: "**"
+    mode: 755
+
+hooks:
+
+  AfterInstall:
+    - location: scripts/install_dependencies.sh
+      timeout: 300
+      runas: root
+
+  ApplicationStop:
+    - location: scripts/stop_application.sh
+      timeout: 60
+      runas: root
+
+  ApplicationStart:
+    - location: scripts/start_application.sh
+      timeout: 120
+      runas: root
