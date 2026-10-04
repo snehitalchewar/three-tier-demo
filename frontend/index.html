@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS 3-Tier Demo</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 20px; margin: 15px 0; }
+    input, button { padding: 10px; margin: 5px 0; }
+    button { cursor: pointer; }
+    li { margin: 8px 0; }
+    .ok { color: green; }
+    .error { color: red; }
+  </style>
+</head>
+<body>
+  <h1>AWS 3-Tier Architecture Demo</h1>
+  <p>Frontend → ALB → App EC2 → RDS PostgreSQL</p>
+
+  <div class="card">
+    <h2>Backend Health</h2>
+    <p id="health">Checking...</p>
+  </div>
+
+  <div class="card">
+    <h2>Add User</h2>
+    <input id="name" placeholder="Name">
+    <input id="email" placeholder="Email" type="email">
+    <button onclick="addUser()">Add User</button>
+    <p id="message"></p>
+  </div>
+
+  <div class="card">
+    <h2>Users from RDS</h2>
+    <button onclick="loadUsers()">Refresh</button>
+    <ul id="users"></ul>
+  </div>
+
+<script>
+async function checkHealth() {
+  try {
+    const r = await fetch('/api/health');
+    const data = await r.json();
+    document.getElementById('health').textContent =
+      `Backend: ${data.status} | Database: ${data.database}`;
+    document.getElementById('health').className = 'ok';
+  } catch (e) {
+    document.getElementById('health').textContent = 'Backend unavailable';
+    document.getElementById('health').className = 'error';
+  }
+}
+
+async function loadUsers() {
+  const list = document.getElementById('users');
+  list.innerHTML = '<li>Loading...</li>';
+  try {
+    const r = await fetch('/api/users');
+    const users = await r.json();
+    list.innerHTML = users.length
+      ? users.map(u => `<li><strong>${u.name}</strong> — ${u.email}</li>`).join('')
+      : '<li>No users yet.</li>';
+  } catch (e) {
+    list.innerHTML = '<li class="error">Could not load users.</li>';
+  }
+}
+
+async function addUser() {
+  const name = document.getElementById('name').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const message = document.getElementById('message');
+
+  if (!name || !email) {
+    message.textContent = 'Enter both name and email.';
+    return;
+  }
+
+  try {
+    const r = await fetch('/api/users', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, email})
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || 'Request failed');
+
+    message.textContent = 'User added successfully.';
+    document.getElementById('name').value = '';
+    document.getElementById('email').value = '';
+    loadUsers();
+  } catch (e) {
+    message.textContent = e.message;
+    message.className = 'error';
+  }
+}
+
+checkHealth();
+loadUsers();
+</script>
+</body>
+</html>
