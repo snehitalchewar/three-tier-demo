@@ -9,6 +9,8 @@ files:
   - source: requirements.txt
     destination: /opt/app
 
+file_exists_behavior: OVERWRITE
+
 hooks:
   ApplicationStop:
     - location: scripts/stop_application.sh
