@@ -59,6 +59,8 @@ App SG:
 DB SG:
 - inbound TCP 5432 from App SG only
 
+-Automatic CodePipeline trigger test
+
 SSM:
 - EC2 instances have an instance profile containing `AmazonSSMManagedInstanceCore`
 - SSM Agent uses outbound HTTPS 443 via NAT or VPC endpoints
