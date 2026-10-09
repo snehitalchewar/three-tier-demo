@@ -23,7 +23,7 @@ def health():
             with conn.cursor() as cur:
                 cur.execute("SELECT 1 AS ok")
                 cur.fetchone()
-        return jsonify(status="ok", database="connected", version="db_version_v3")
+        return jsonify(status="ok", database="connected", version="db_version_v4")
     except Exception as e:
         return jsonify(status="ok", database="error", detail=str(e)), 503
 
