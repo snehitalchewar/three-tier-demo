@@ -59,7 +59,7 @@ def create_user():
 
 @app.get("/")
 def root():
-    return jsonify(message="3-tier demo backend v2 on ECS")
+    return jsonify(message="3-tier demo backend v3 on ECS")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000)
